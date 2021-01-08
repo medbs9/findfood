@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "523203189672",
+    "firebase_url": "https://findfood-bc37f.firebaseio.com",
+    "project_id": "findfood-bc37f",
+    "storage_bucket": "findfood-bc37f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:523203189672:android:cae1c13395f3af9c3ddb9d",
+        "android_client_info": {
+          "package_name": "com.example.find_food"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "523203189672-a8hs6b6t8da2hnjv0pn1uqp2r1pluc80.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1_KZrnh3WYRdh9jfAgfUriAJzU1Ne_QI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "523203189672-a8hs6b6t8da2hnjv0pn1uqp2r1pluc80.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
