@@ -120,6 +120,7 @@ class _ConfirmerState extends State<Confirmer> {
                           iQuantity: quantity.toString(),
                           iuser: user.uid,
                           iproductuser: product.puser,
+                          docid: null,
                         );
                         _store.addCartItem(cartItemModel);
 

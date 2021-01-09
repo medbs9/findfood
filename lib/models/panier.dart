@@ -8,8 +8,10 @@ class CartItemModel {
   String iProductid;
   String iuser;
   String iproductuser;
+  String docid;
   CartItemModel(
       {this.iId,
+      this.docid,
       this.iImage,
       this.iproductuser,
       this.iName,

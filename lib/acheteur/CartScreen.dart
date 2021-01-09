@@ -4,7 +4,9 @@ import 'package:find_food/acheteur/acheteur.dart';
 import 'package:find_food/acheteur/homepage.dart';
 import 'package:find_food/models/Product.dart';
 import 'package:find_food/models/panier.dart';
+import 'package:find_food/models/user.dart';
 import 'package:find_food/providers/CartItem.dart';
+import 'package:find_food/services/adduser.dart';
 import 'package:find_food/services/store.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,7 @@ class _CartScreenState extends State<CartScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _store = Store();
   User user;
+  final _store2 = AddUser();
   //String name;
   //String q;
   List<String> list = [];
@@ -38,6 +41,8 @@ class _CartScreenState extends State<CartScreen> {
     user = _auth.currentUser;
     setState(() {});
   }
+
+  List info = [];
 
   @override
   Widget build(BuildContext context) {
@@ -76,134 +81,167 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ),
       backgroundColor: Colors.white,
-      body: ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            if (items[index].iuser != user.uid) {
-              Provider.of<CartItem>(context, listen: false)
-                  .removefromcart(items[index]);
-            }
+      body: StreamBuilder<QuerySnapshot>(
+          stream: _store2.loaduser(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<Utilisateur> utilisatuers = [];
+              for (var doc in snapshot.data.docs) {
+                var data = doc.data();
+                utilisatuers.add(Utilisateur(
+                    uName: data[kname],
+                    uemail: data[kmail],
+                    uPhone: data[kphone],
+                    uImage: data[kuImage],
+                    uuid: doc.id,
+                    uId: data[kuid]));
+              }
 
-            if ((items.isEmpty == false)) {
-              list.add(items[index].iproductuser);
-              return Padding(
-                padding: const EdgeInsets.all(16),
-                child: Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.blue.withOpacity(0.2),
-                            offset: Offset(3, 2),
-                            blurRadius: 30)
-                      ]),
-                  child: Row(
-                    children: <Widget>[
-                      ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          topLeft: Radius.circular(20),
-                        ),
-                        child: Image.network(
-                          items[index].iImage,
+              for (Utilisateur i in utilisatuers) {
+                if (i.uId == user.uid) {
+                  info.add(i.uName);
+                }
+              }
+              return ListView.builder(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    if (items[index].iuser != user.uid) {
+                      Provider.of<CartItem>(context, listen: false)
+                          .removefromcart(items[index]);
+                    }
+
+                    if ((items.isEmpty == false)) {
+                      list.add(items[index].iproductuser.toString());
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Container(
                           height: 120,
-                          width: 140,
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            RichText(
-                              text: TextSpan(children: [
-                                TextSpan(
-                                    text: items[index].iName + "\n",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold)),
-                                TextSpan(
-                                    text: "${items[index].iPrice}\D\T \n\n",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w300)),
-                                TextSpan(
-                                    text: "Quantity: ",
-                                    style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400)),
-                                TextSpan(
-                                    text: items[index].iQuantity.toString(),
-                                    style: TextStyle(
-                                        color: Colors.blue,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400)),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.blue.withOpacity(0.2),
+                                    offset: Offset(3, 2),
+                                    blurRadius: 30)
                               ]),
-                            ),
-                            IconButton(
-                                icon: Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
+                          child: Row(
+                            children: <Widget>[
+                              ClipRRect(
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(20),
+                                  topLeft: Radius.circular(20),
                                 ),
-                                onPressed: () {
-                                  Alert(
-                                      context: context,
-                                      title:
-                                          "Voulez vous vraiment supprimer cet article?",
-                                      buttons: [
-                                        DialogButton(
-                                          onPressed: () {
-                                            products[index].pQuantity +=
-                                                int.parse(
-                                                    items[index].iQuantity);
-                                            _store.editProduct(
-                                                ({
-                                                  kProductQuantity:
-                                                      products[index].pQuantity,
-                                                }),
-                                                products[index].pId);
-                                            Provider.of<CartItem>(context,
-                                                    listen: false)
-                                                .removefromcart(items[index]);
-                                            Provider.of<CartItem>(context,
-                                                    listen: false)
-                                                .removefromproducts(
-                                                    products[index]);
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text(
-                                            "Confirmer",
+                                child: Image.network(
+                                  items[index].iImage,
+                                  height: 120,
+                                  width: 140,
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    RichText(
+                                      text: TextSpan(children: [
+                                        TextSpan(
+                                            text: items[index].iName + "\n",
                                             style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20),
-                                          ),
-                                        )
-                                      ]).show();
-                                })
-                          ],
+                                                color: Colors.black,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold)),
+                                        TextSpan(
+                                            text:
+                                                "${items[index].iPrice}\D\T \n\n",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w300)),
+                                        TextSpan(
+                                            text: "Quantity: ",
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w400)),
+                                        TextSpan(
+                                            text: items[index]
+                                                .iQuantity
+                                                .toString(),
+                                            style: TextStyle(
+                                                color: Colors.blue,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w400)),
+                                      ]),
+                                    ),
+                                    IconButton(
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () {
+                                          Alert(
+                                              context: context,
+                                              title:
+                                                  "Voulez vous vraiment supprimer cet article?",
+                                              buttons: [
+                                                DialogButton(
+                                                  onPressed: () {
+                                                    products[index].pQuantity +=
+                                                        int.parse(items[index]
+                                                            .iQuantity);
+                                                    _store.editProduct(
+                                                        ({
+                                                          kProductQuantity:
+                                                              products[index]
+                                                                  .pQuantity,
+                                                        }),
+                                                        products[index].pId);
+                                                    Provider.of<CartItem>(
+                                                            context,
+                                                            listen: false)
+                                                        .removefromcart(
+                                                            items[index]);
+                                                    Provider.of<CartItem>(
+                                                            context,
+                                                            listen: false)
+                                                        .removefromproducts(
+                                                            products[index]);
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text(
+                                                    "Confirmer",
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 20),
+                                                  ),
+                                                )
+                                              ]).show();
+                                        })
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                ),
-              );
+                      );
+                    } else {
+                      return Container(
+                        child: Center(
+                          child: Text(
+                            'Votre panier est vide',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                      );
+                    }
+                  });
             } else {
-              return Container(
-                child: Center(
-                  child: Text(
-                    'Votre panier est vide',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-              );
+              return Center(child: Text('Loading...'));
             }
           }),
       bottomNavigationBar: Builder(
@@ -251,12 +289,14 @@ class _CartScreenState extends State<CartScreen> {
               if (items.isEmpty == false) {
                 try {
                   _store.storeOrders({
-                    "iproductuser": list[0],
+                    "iproductuser": list,
                     "userid": user.uid,
+                    "username": info[0],
                     "Date": DateFormat('yyyy-MM-dd – kk:mm')
                         .format(DateTime.now())
                         .toString()
                   }, items);
+
                   Scaffold.of(context).showSnackBar(SnackBar(
                     content: Text("Ordered successfully"),
                   ));

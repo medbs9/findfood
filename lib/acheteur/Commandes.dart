@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:find_food/acheteur/Orderdetails2.dart';
 import 'package:find_food/acheteur/acheteur.dart';
 import 'package:find_food/acheteur/homepage.dart';
 import 'package:find_food/constants.dart';
 import 'package:find_food/models/Orders.dart';
 import 'package:find_food/models/user.dart';
 import 'package:find_food/services/adduser.dart';
-import 'package:find_food/vendeur/OrderDetails.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -130,61 +130,77 @@ class _CommandesState extends State<Commandes> {
                         return ListView.builder(
                           itemBuilder: (context, index) => Padding(
                             padding: const EdgeInsets.all(20),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, OrderDetails.id,
-                                    arguments: orders[index].orderid);
-                              },
-                              child: Card(
-                                  color: Colors.blue[300],
-                                  elevation: 4.0,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: ListTile(
-                                    title: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              .16,
-                                      color: Colors.blue[300],
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            /*Text(
-                                                'Id user : ${orders[index].iuser}',
+                            child: CupertinoContextMenu(
+                              actions: <Widget>[
+                                CupertinoContextMenuAction(
+                                  child: Center(child: Text('Supprimer')),
+                                  onPressed: () {
+                                    FirebaseFirestore.instance
+                                        .collection("Orders")
+                                        .doc(orders[index].orderid)
+                                        .delete();
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(context, OrderDetails2.id,
+                                      arguments: orders[index].orderid);
+                                },
+                                child: Card(
+                                    color: Colors.blue[300],
+                                    elevation: 4.0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: ListTile(
+                                      title: Container(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                .16,
+                                        color: Colors.blue[300],
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              /*Text(
+                                                  'Id user : ${orders[index].iuser}',
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              SizedBox(
+                                                height: 10,
+                                              ),*/
+                                              Text(
+                                                ' Date : ${orders[index].dateTime}',
                                                 style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight:
-                                                        FontWeight.bold)),
-                                            SizedBox(
-                                              height: 10,
-                                            ),*/
-                                            Text(
-                                              ' Date : ${orders[index].dateTime}',
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold),
-                                            )
-                                          ],
+                                                        FontWeight.bold),
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    trailing: Column(
-                                      children: [
-                                        SizedBox(
-                                          height: 32,
-                                        ),
-                                        Icon(
-                                          Icons.keyboard_arrow_right,
-                                          color: Colors.black,
-                                        ),
-                                      ],
-                                    ),
-                                  )),
+                                      trailing: Column(
+                                        children: [
+                                          SizedBox(
+                                            height: 32,
+                                          ),
+                                          Icon(
+                                            Icons.keyboard_arrow_right,
+                                            color: Colors.black,
+                                          ),
+                                        ],
+                                      ),
+                                    )),
+                              ),
                             ),
                           ),
                           itemCount: orders.length,

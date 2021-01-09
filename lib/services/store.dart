@@ -1,6 +1,7 @@
 //import 'dart:html';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:find_food/models/Orders.dart';
 import 'package:find_food/models/Product.dart';
 import 'package:find_food/constants.dart';
 import 'package:find_food/models/panier.dart';
@@ -39,6 +40,7 @@ class Store {
       "iSoc": item.iSoc,
       "iuser": item.iuser,
       "iproductuser": item.iproductuser,
+      "docid": item.docid,
     });
   }
 
@@ -63,10 +65,10 @@ class Store {
         "iPrice": item.iPrice,
         "iQuantity": item.iQuantity,
         "iImage": item.iImage,
-        "productid": item.iSoc,
-        "Date": null,
-        "userid": null,
-        "iproductuser": null,
+        "productid": item.iproductuser,
+        //"Date": null,
+        //"userid": null,
+        //"iproductuser": null,
       });
     }
   }

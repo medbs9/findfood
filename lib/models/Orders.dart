@@ -5,11 +5,13 @@ class Order {
   String iPrice;
   String iuser;
   String orderid;
-  String iproductuser;
+  List<dynamic> iproductuser;
   String dateTime;
+  String username;
   Order({
     this.dateTime,
     this.orderid,
+    this.username,
     this.iImage,
     this.iName,
     this.iproductuser,
