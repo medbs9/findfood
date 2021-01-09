@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:find_food/drawer/Help.dart';
 import 'package:find_food/drawer/profile.dart';
 import 'package:find_food/models/user.dart';
 import 'package:find_food/services/adduser.dart';
@@ -153,8 +154,28 @@ class _ParametresState extends State<Parametres> {
                             },
                           ),
                         ),
+                        SizedBox(
+                            //height: 10,
+                            ),
+                        Card(
+                          elevation: 4.0,
+                          margin: const EdgeInsets.fromLTRB(32, 10, 32, 16),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.help,
+                              color: Colors.blue,
+                            ),
+                            title: Text("Comment ça marche"),
+                            trailing: Icon(Icons.keyboard_arrow_right),
+                            onTap: () {
+                              Navigator.pushNamed(context, Help.id);
+                            },
+                          ),
+                        ),
                         const SizedBox(
-                          height: 130,
+                          height: 100,
                         ),
                         Text(
                           "Parametres de notification",
@@ -173,20 +194,6 @@ class _ParametresState extends State<Parametres> {
                           contentPadding: const EdgeInsets.all(0),
                           title: Text(
                             "Recevoir des notifications",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                            ),
-                          ),
-                          value: true,
-                          onChanged: (val) {},
-                        ),
-                        SwitchListTile(
-                          dense: true,
-                          activeColor: Colors.blue[400],
-                          contentPadding: const EdgeInsets.all(0),
-                          title: Text(
-                            "newsletters et offres spéciales",
                             style: TextStyle(
                               fontSize: 15,
                               color: Colors.black,

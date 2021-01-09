@@ -9,6 +9,7 @@ import 'package:find_food/acheteur/details.dart';
 import 'package:find_food/acheteur/homepage.dart';
 import 'package:find_food/acheteur/recherche.dart';
 import 'package:find_food/drawer/Contact.dart';
+import 'package:find_food/drawer/Help.dart';
 import 'package:find_food/drawer/Settings.dart';
 import 'package:find_food/drawer/aboutUs.dart';
 import 'package:find_food/drawer/parametres.dart';
@@ -75,6 +76,7 @@ class MyApp extends StatelessWidget {
             Commandes.id: (context) => Commandes(),
             Home.id: (context) => Home(),
             OrderDetails2.id: (context) => OrderDetails2(),
+            Help.id: (context) => Help(),
           }),
     );
   }
