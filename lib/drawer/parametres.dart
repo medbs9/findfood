@@ -4,6 +4,7 @@ import 'package:find_food/drawer/profile.dart';
 import 'package:find_food/models/user.dart';
 import 'package:find_food/services/adduser.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -20,8 +21,11 @@ class _ParametresState extends State<Parametres> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   String password;
+  String password2;
   User user;
   Utilisateur uuu;
+  bool _flutter = true;
+
   @override
   void initState() {
     super.initState();
@@ -188,7 +192,7 @@ class _ParametresState extends State<Parametres> {
                         SizedBox(
                           height: 20,
                         ),
-                        SwitchListTile(
+                        /*SwitchListTile(
                           dense: true,
                           activeColor: Colors.blue[400],
                           contentPadding: const EdgeInsets.all(0),
@@ -199,8 +203,29 @@ class _ParametresState extends State<Parametres> {
                               color: Colors.black,
                             ),
                           ),
-                          value: true,
-                          onChanged: (val) {},
+                          value: _flutter,
+                          inactiveTrackColor: Colors.grey,
+                          onChanged: (bool value) {
+                            setState(() {
+                              _flutter = value;
+                            });
+                          },
+                        ),*/
+                        ListTile(
+                          title: Text('Recevoir des notifications'),
+                          trailing: CupertinoSwitch(
+                            value: _flutter,
+                            onChanged: (bool value) {
+                              setState(() {
+                                _flutter = value;
+                              });
+                            },
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _flutter = !_flutter;
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -230,6 +255,9 @@ class _ParametresState extends State<Parametres> {
               ),
               TextFormField(
                 obscureText: true,
+                onSaved: (value) {
+                  password2 = value;
+                },
                 decoration: InputDecoration(
                   labelText: 'Nouveau mot de passe',
                 ),
@@ -252,20 +280,26 @@ class _ParametresState extends State<Parametres> {
               if (_globalKey.currentState.validate()) {
                 _globalKey.currentState.save();
                 try {
-                  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-                  User currentUser = firebaseAuth.currentUser;
-                  currentUser.updatePassword(password).then((_) {
-                    editUser({
-                      kpwd: password,
-                    }, uuu.uuid);
-                    Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            "votre mot de passe à été changé avec succès")));
-                  }).catchError((err) {
+                  if (password == password2) {
+                    final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+                    User currentUser = firebaseAuth.currentUser;
+                    currentUser.updatePassword(password).then((_) {
+                      editUser({
+                        kpwd: password,
+                      }, uuu.uuid);
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              "votre mot de passe à été changé avec succès")));
+                    }).catchError((err) {
+                      Scaffold.of(context).showSnackBar(
+                          SnackBar(content: Text("Réessayez SVP")));
+                    });
+                    Navigator.pop(context);
+                  } else {
+                    Navigator.pop(context);
                     Scaffold.of(context)
                         .showSnackBar(SnackBar(content: Text("Réessayez SVP")));
-                  });
-                  Navigator.pop(context);
+                  }
                 } catch (e) {
                   Scaffold.of(context)
                       .showSnackBar(SnackBar(content: Text(e.message)));
