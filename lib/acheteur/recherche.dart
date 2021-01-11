@@ -102,9 +102,6 @@ class RechercherState extends State<Rechercher> {
                       itemBuilder: (context, index) {
                         return Opacity(
                           opacity: 1,
-                          //Datetime.parse(products[index].date).isafter(Datetime.now())?
-                          //opacity: 0.5 : opacity: 0.0
-
                           child: Container(
                             margin: EdgeInsets.symmetric(vertical: 12.0),
                             padding: EdgeInsets.symmetric(horizontal: 25.0),

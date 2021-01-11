@@ -8,6 +8,7 @@ import 'package:find_food/acheteur/acheteur.dart';
 import 'package:find_food/acheteur/details.dart';
 import 'package:find_food/acheteur/homepage.dart';
 import 'package:find_food/acheteur/recherche.dart';
+import 'package:find_food/acheteur/sidebar.dart';
 import 'package:find_food/drawer/Contact.dart';
 import 'package:find_food/drawer/Help.dart';
 import 'package:find_food/drawer/Settings.dart';
@@ -77,6 +78,7 @@ class MyApp extends StatelessWidget {
             Home.id: (context) => Home(),
             OrderDetails2.id: (context) => OrderDetails2(),
             Help.id: (context) => Help(),
+            DrawerScreen.id: (context) => DrawerScreen(),
           }),
     );
   }

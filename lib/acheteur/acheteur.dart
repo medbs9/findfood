@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_food/acheteur/Explore.dart';
 import 'package:find_food/acheteur/details.dart';
+import 'package:find_food/acheteur/config.dart';
 import 'package:find_food/constants.dart';
 import 'package:find_food/drawer/Contact.dart';
 import 'package:find_food/drawer/aboutUs.dart';
@@ -71,225 +72,444 @@ class _AcheteurState extends State<Acheteur> {
     });
   }
 
+  double xOffset = 0;
+  double yOffset = 0;
+  double scaleFactor = 1;
+
+  bool isDrawerOpen = false;
   @override
   Widget build(BuildContext context) {
     List<CartItemModel> items = Provider.of<CartItem>(context).items;
     Utilisateur uuu = ModalRoute.of(context).settings.arguments;
     return Stack(
-      children: <Widget>[
-        DefaultTabController(
-          length: 6,
-          child: ModalProgressHUD(
-            inAsyncCall: Provider.of<ModelHud>(context).isLoading,
-            child: Scaffold(
-              appBar: AppBar(
-                backgroundColor: Colors.white,
-                elevation: 0,
-                leading: Builder(
-                  builder: (context) => IconButton(
-                    icon: Icon(
-                      Icons.menu_rounded,
-                      color: Colors.green[300],
-                    ),
-                    onPressed: () => Scaffold.of(context).openDrawer(),
+      children: [
+        Container(
+          color: Color(0xff9EC1A3),
+          //primaryGreen,
+          padding: EdgeInsets.only(top: 50, bottom: 70, left: 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    maxRadius: 35,
+                    backgroundColor:
+                        Theme.of(context).platform == TargetPlatform.iOS
+                            ? Colors.blue
+                            : Colors.white,
+                    child: uuu.uImage != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(100),
+                            child: Image(
+                              image: NetworkImage(uuu.uImage),
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : Text(
+                            '${user?.email[0].toUpperCase()}',
+                            style: TextStyle(fontSize: 40.0),
+                          ),
                   ),
-                ),
-                centerTitle: true,
-                title: RichText(
-                  text: TextSpan(
-                    style: Theme.of(context)
-                        .textTheme
-                        .headline6
-                        .copyWith(fontWeight: FontWeight.bold),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextSpan(
-                        text: "Find",
-                        style:
-                            TextStyle(color: Colors.green[300], fontSize: 25),
+                      Text(
+                        uuu.uName,
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
                       ),
-                      TextSpan(
-                        text: "Food",
-                        style: TextStyle(color: Colors.black, fontSize: 25),
+                      Text("${user?.email}",
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold))
+                    ],
+                  )
+                ],
+              ),
+              Column(children: [
+                /*drawerItems
+                    .map((element) => Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                element['icon'],
+                                color: Colors.white,
+                                size: 30,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(element['title'],
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20))
+                            ],
+                          ),
+                        ))
+                    .toList(),*/
+                ListTile(
+                  leading: Icon(
+                    Icons.person,
+                    color: Colors.white,
+                  ),
+                  title: Text(
+                    "Profil",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      Profile.id,
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.settings,
+                    color: Colors.white,
+                  ),
+                  title: Text(
+                    "Parametres",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      Parametres.id,
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.info,
+                    color: Colors.white,
+                  ),
+                  title: Text(
+                    "À propos de nous",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(new CupertinoPageRoute(
+                        builder: (context) => AboutUs()));
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.phone,
+                    color: Colors.white,
+                  ),
+                  title: Text(
+                    "Contactez nous",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(new CupertinoPageRoute(
+                        builder: (context) => Contact()));
+                  },
+                ),
+              ]),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, Authentification.id);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.logout,
+                        color: Colors.white,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Se déconnecter',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                 ),
-                actions: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.explore,
-                      color: Colors.green[300],
-                      size: 30,
-                    ),
-                    onPressed: () async {
-                      final modelhud =
-                          Provider.of<ModelHud>(context, listen: false);
-                      modelhud.changeisLoading(true);
-                      await _getCurrentLocation();
-                      modelhud.changeisLoading(false);
-                      Navigator.pushNamed(context, Explore.id, arguments: aaa);
-                      print(aaa);
-                    },
-                  ),
-                ],
-                bottom: TabBar(
-                  isScrollable: true,
-                  indicatorColor: Colors.green[300],
-                  onTap: (value) {
-                    setState(() {
-                      _tabBarIndex = value;
-                    });
-                  },
-                  tabs: <Widget>[
-                    Text(
-                      'FastFoods',
-                      style: TextStyle(
-                        color: _tabBarIndex == 0 ? Colors.black : Colors.grey,
-                        fontSize: _tabBarIndex == 0 ? 16 : null,
+              )
+            ],
+          ),
+        ),
+        AnimatedContainer(
+          transform: Matrix4.translationValues(xOffset, yOffset, 0)
+            ..scale(scaleFactor)
+            ..rotateY(isDrawerOpen ? -0.5 : 0),
+          duration: Duration(milliseconds: 250),
+          decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(isDrawerOpen ? 40 : 0.0)),
+          child: Stack(
+            children: <Widget>[
+              DefaultTabController(
+                length: 6,
+                child: ModalProgressHUD(
+                  inAsyncCall: Provider.of<ModelHud>(context).isLoading,
+                  child: Scaffold(
+                    appBar: AppBar(
+                      backgroundColor: Colors.white,
+                      elevation: 0,
+                      leading: Builder(
+                        builder: (context) => isDrawerOpen
+                            ? IconButton(
+                                icon: Icon(
+                                  Icons.arrow_back_ios,
+                                  color: Colors.green[300],
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    xOffset = 0;
+                                    yOffset = 0;
+                                    scaleFactor = 1;
+                                    isDrawerOpen = false;
+                                  });
+                                },
+                              )
+                            : IconButton(
+                                icon: Icon(
+                                  Icons.menu,
+                                  color: Colors.green[300],
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    xOffset = 230;
+                                    yOffset = 150;
+                                    scaleFactor = 0.6;
+                                    isDrawerOpen = true;
+                                  });
+                                }),
                       ),
-                    ),
-                    Text(
-                      'Restaurants',
-                      style: TextStyle(
-                        color: _tabBarIndex == 1 ? Colors.black : Colors.grey,
-                        fontSize: _tabBarIndex == 1 ? 16 : null,
-                      ),
-                    ),
-                    Text(
-                      'Epiceries',
-                      style: TextStyle(
-                        color: _tabBarIndex == 2 ? Colors.black : Colors.grey,
-                        fontSize: _tabBarIndex == 2 ? 16 : null,
-                      ),
-                    ),
-                    Text(
-                      'Supermarches',
-                      style: TextStyle(
-                        color: _tabBarIndex == 3 ? Colors.black : Colors.grey,
-                        fontSize: _tabBarIndex == 3 ? 16 : null,
-                      ),
-                    ),
-                    Text(
-                      'Boulangeries',
-                      style: TextStyle(
-                        color: _tabBarIndex == 4 ? Colors.black : Colors.grey,
-                        fontSize: _tabBarIndex == 4 ? 16 : null,
-                      ),
-                    ),
-                    Text(
-                      'Patisseries',
-                      style: TextStyle(
-                        color: _tabBarIndex == 5 ? Colors.black : Colors.grey,
-                        fontSize: _tabBarIndex == 5 ? 16 : null,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              drawer: Theme(
-                data: Theme.of(context).copyWith(
-                  primaryColor: Colors.green[400],
-                  primaryColorBrightness: Brightness.light,
-                ),
-                child: Drawer(
-                  elevation: 10.0,
-                  child: ListView(
-                    children: <Widget>[
-                      Container(
-                        color: Colors.green[400],
-                        child: UserAccountsDrawerHeader(
-                          accountEmail: Text("${user?.email}"),
-                          accountName: Text(uuu.uName),
-                          currentAccountPicture: CircleAvatar(
-                            maxRadius: 60,
-                            backgroundColor:
-                                Theme.of(context).platform == TargetPlatform.iOS
-                                    ? Colors.blue
-                                    : Colors.white,
-                            child: uuu.uImage != null
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(100),
-                                    child: Image(
-                                      image: NetworkImage(uuu.uImage),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : Text(
-                                    '${user?.email[0].toUpperCase()}',
-                                    style: TextStyle(fontSize: 40.0),
-                                  ),
-                          ),
+                      centerTitle: true,
+                      title: RichText(
+                        text: TextSpan(
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline6
+                              .copyWith(fontWeight: FontWeight.bold),
+                          children: [
+                            TextSpan(
+                              text: "Find",
+                              style: TextStyle(
+                                  color: Colors.green[300], fontSize: 25),
+                            ),
+                            TextSpan(
+                              text: "Food",
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 25),
+                            ),
+                          ],
                         ),
                       ),
-                      ListTile(
-                        leading: Icon(Icons.person),
-                        title: Text("Profil"),
-                        trailing: Icon(Icons.arrow_right),
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            Profile.id,
-                          );
-                        },
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.settings),
-                        title: Text("Parametres"),
-                        trailing: Icon(Icons.arrow_right),
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            Parametres.id,
-                          );
-                        },
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.info),
-                        title: Text("À propos de nous"),
-                        trailing: Icon(Icons.arrow_right),
-                        onTap: () {
-                          Navigator.of(context).push(new CupertinoPageRoute(
-                              builder: (context) => AboutUs()));
-                        },
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.phone),
-                        title: Text("Contactez nous"),
-                        trailing: Icon(Icons.arrow_right),
-                        onTap: () {
-                          Navigator.of(context).push(new CupertinoPageRoute(
-                              builder: (context) => Contact()));
-                        },
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 240),
-                        child: ListTile(
-                          leading: Icon(Icons.logout),
-                          title: Text("Se déconnecter"),
-                          trailing: Icon(Icons.arrow_right),
-                          onTap: () {
-                            Navigator.of(context).push(new CupertinoPageRoute(
-                                builder: (context) => Authentification()));
+                      actions: <Widget>[
+                        IconButton(
+                          icon: Icon(
+                            Icons.explore,
+                            color: Colors.green[300],
+                            size: 30,
+                          ),
+                          onPressed: () async {
+                            final modelhud =
+                                Provider.of<ModelHud>(context, listen: false);
+                            modelhud.changeisLoading(true);
+                            await _getCurrentLocation();
+                            modelhud.changeisLoading(false);
+                            Navigator.pushNamed(context, Explore.id,
+                                arguments: aaa);
+                            print(aaa);
                           },
                         ),
+                      ],
+                      bottom: TabBar(
+                        isScrollable: true,
+                        indicatorColor: Colors.green[300],
+                        onTap: (value) {
+                          setState(() {
+                            _tabBarIndex = value;
+                          });
+                        },
+                        tabs: <Widget>[
+                          Text(
+                            'FastFoods',
+                            style: TextStyle(
+                              color: _tabBarIndex == 0
+                                  ? Colors.black
+                                  : Colors.grey,
+                              fontSize: _tabBarIndex == 0 ? 16 : null,
+                            ),
+                          ),
+                          Text(
+                            'Restaurants',
+                            style: TextStyle(
+                              color: _tabBarIndex == 1
+                                  ? Colors.black
+                                  : Colors.grey,
+                              fontSize: _tabBarIndex == 1 ? 16 : null,
+                            ),
+                          ),
+                          Text(
+                            'Epiceries',
+                            style: TextStyle(
+                              color: _tabBarIndex == 2
+                                  ? Colors.black
+                                  : Colors.grey,
+                              fontSize: _tabBarIndex == 2 ? 16 : null,
+                            ),
+                          ),
+                          Text(
+                            'Supermarches',
+                            style: TextStyle(
+                              color: _tabBarIndex == 3
+                                  ? Colors.black
+                                  : Colors.grey,
+                              fontSize: _tabBarIndex == 3 ? 16 : null,
+                            ),
+                          ),
+                          Text(
+                            'Boulangeries',
+                            style: TextStyle(
+                              color: _tabBarIndex == 4
+                                  ? Colors.black
+                                  : Colors.grey,
+                              fontSize: _tabBarIndex == 4 ? 16 : null,
+                            ),
+                          ),
+                          Text(
+                            'Patisseries',
+                            style: TextStyle(
+                              color: _tabBarIndex == 5
+                                  ? Colors.black
+                                  : Colors.grey,
+                              fontSize: _tabBarIndex == 5 ? 16 : null,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
+                    /*drawer: Theme(
+                      data: Theme.of(context).copyWith(
+                        primaryColor: Colors.green[400],
+                        primaryColorBrightness: Brightness.light,
+                      ),
+                      child: Drawer(
+                        elevation: 10.0,
+                        child: ListView(
+                          children: <Widget>[
+                            Container(
+                              color: Colors.green[400],
+                              child: UserAccountsDrawerHeader(
+                                accountEmail: Text("${user?.email}"),
+                                accountName: Text(uuu.uName),
+                                currentAccountPicture: CircleAvatar(
+                                  maxRadius: 60,
+                                  backgroundColor: Theme.of(context).platform ==
+                                          TargetPlatform.iOS
+                                      ? Colors.blue
+                                      : Colors.white,
+                                  child: uuu.uImage != null
+                                      ? ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                          child: Image(
+                                            image: NetworkImage(uuu.uImage),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        )
+                                      : Text(
+                                          '${user?.email[0].toUpperCase()}',
+                                          style: TextStyle(fontSize: 40.0),
+                                        ),
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.person),
+                              title: Text("Profil"),
+                              trailing: Icon(Icons.arrow_right),
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  Profile.id,
+                                );
+                              },
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.settings),
+                              title: Text("Parametres"),
+                              trailing: Icon(Icons.arrow_right),
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  Parametres.id,
+                                );
+                              },
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.info),
+                              title: Text("À propos de nous"),
+                              trailing: Icon(Icons.arrow_right),
+                              onTap: () {
+                                Navigator.of(context).push(
+                                    new CupertinoPageRoute(
+                                        builder: (context) => AboutUs()));
+                              },
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.phone),
+                              title: Text("Contactez nous"),
+                              trailing: Icon(Icons.arrow_right),
+                              onTap: () {
+                                Navigator.of(context).push(
+                                    new CupertinoPageRoute(
+                                        builder: (context) => Contact()));
+                              },
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 240),
+                              child: ListTile(
+                                leading: Icon(Icons.logout),
+                                title: Text("Se déconnecter"),
+                                trailing: Icon(Icons.arrow_right),
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                      new CupertinoPageRoute(
+                                          builder: (context) =>
+                                              Authentification()));
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),*/
+                    //bottomNavigationBar: BottomNavBar(),
+
+                    body: TabBarView(
+                      children: <Widget>[
+                        FastFoods("Fast food"),
+                        FastFoods("Restaurant"),
+                        FastFoods("Epicerie"),
+                        FastFoods("Super marché"),
+                        FastFoods("boulangerie"),
+                        FastFoods("Patisserie"),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              //bottomNavigationBar: BottomNavBar(),
-
-              body: TabBarView(
-                children: <Widget>[
-                  FastFoods("Fast food"),
-                  FastFoods("Restaurant"),
-                  FastFoods("Epicerie"),
-                  FastFoods("Super marché"),
-                  FastFoods("boulangerie"),
-                  FastFoods("Patisserie"),
-                ],
-              ),
-            ),
+            ],
           ),
         ),
       ],
